@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { parseUnits } from 'viem'
 import { CONTRACTS, TOKEN_OPTIONS, EXPLORER_URL } from '@/lib/contracts'
@@ -13,6 +13,7 @@ export default function CreateJobPage() {
   const [agentId, setAgentId] = useState('')
   const [deadline, setDeadline] = useState('7')
   const [step, setStep] = useState<'form' | 'approve' | 'create'>('form')
+  const [formError, setFormError] = useState<string | null>(null)
 
   const {
     writeContract: writeApprove,
@@ -30,10 +31,24 @@ export default function CreateJobPage() {
 
   const { isSuccess: approveConfirmed } = useWaitForTransactionReceipt({ hash: approveHash })
   const { isSuccess: createConfirmed, isLoading: isConfirmingCreate } = useWaitForTransactionReceipt({ hash: createHash })
+  const isApprovalValid = approveConfirmed && step === 'approve'
+
+  useEffect(() => {
+    setFormError(null)
+    setStep('form')
+  }, [token, budget])
 
   const handleApprove = () => {
     if (!budget) return
-    const amount = parseUnits(budget, 6)
+    setFormError(null)
+
+    let amount: bigint
+    try {
+      amount = parseUnits(budget, 6)
+    } catch {
+      setFormError('Please enter a valid budget amount (up to 6 decimal places).')
+      return
+    }
 
     writeApprove({
       address: token as `0x${string}`,
@@ -46,9 +61,33 @@ export default function CreateJobPage() {
 
   const handleCreate = () => {
     if (!budget || !description) return
-    const amount = parseUnits(budget, 6)
+    setFormError(null)
+
+    let amount: bigint
+    try {
+      amount = parseUnits(budget, 6)
+    } catch {
+      setFormError('Please enter a valid budget amount (up to 6 decimal places).')
+      return
+    }
+
     const deadlineTimestamp = BigInt(Math.floor(Date.now() / 1000) + Number(deadline) * 86400)
-    const agentIdNum = agentId ? BigInt(agentId) : BigInt(0)
+
+    let agentIdNum = BigInt(0)
+    if (agentId.trim()) {
+      const parsedAgentId = Number(agentId)
+      if (!Number.isInteger(parsedAgentId) || parsedAgentId <= 0) {
+        setFormError('Agent ID must be a positive whole number.')
+        return
+      }
+
+      try {
+        agentIdNum = BigInt(agentId)
+      } catch {
+        setFormError('Agent ID must be a valid positive integer.')
+        return
+      }
+    }
 
     writeCreate({
       address: CONTRACTS.AgentJobMarketplace.address,
@@ -73,8 +112,8 @@ export default function CreateJobPage() {
           <p className="text-gray-400">Please connect your wallet to create a job.</p>
         </div>
       ) : createConfirmed ? (
-        <div className="glass-card p-8 border-arc-green/30">
-          <h3 className="text-arc-green font-heading font-semibold text-xl mb-3">
+        <div className="glass-card p-8 border-[#6C9EA9]/30 bg-[#13304E]">
+          <h3 className="text-[#6C9EA9] font-heading font-semibold text-xl mb-3">
             Job Created Successfully!
           </h3>
           <p className="text-gray-400 mb-4">
@@ -85,7 +124,7 @@ export default function CreateJobPage() {
               href={`${EXPLORER_URL}/tx/${createHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-arc-cyan hover:underline text-sm"
+              className="text-[#406A83] hover:underline text-sm"
             >
               View on Explorer →
             </a>
@@ -94,13 +133,14 @@ export default function CreateJobPage() {
       ) : (
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Job Description *
-            </label>
-            <textarea
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="Describe the task you need an AI agent to complete..."
+              <label htmlFor="job-description" className="block text-sm font-medium text-gray-300 mb-2">
+                Job Description *
+              </label>
+              <textarea
+                id="job-description"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Describe the task you need an AI agent to complete..."
               className="input-field min-h-[120px] resize-y"
               rows={4}
               required
@@ -109,10 +149,11 @@ export default function CreateJobPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="job-budget" className="block text-sm font-medium text-gray-300 mb-2">
                 Budget Amount *
               </label>
               <input
+                id="job-budget"
                 type="number"
                 value={budget}
                 onChange={e => setBudget(e.target.value)}
@@ -124,10 +165,11 @@ export default function CreateJobPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="job-token" className="block text-sm font-medium text-gray-300 mb-2">
                 Payment Token
               </label>
               <select
+                id="job-token"
                 value={token}
                 onChange={e => setToken(e.target.value)}
                 className="input-field"
@@ -143,10 +185,11 @@ export default function CreateJobPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="job-agent-id" className="block text-sm font-medium text-gray-300 mb-2">
                 Agent ID (optional)
               </label>
               <input
+                id="job-agent-id"
                 type="number"
                 value={agentId}
                 onChange={e => setAgentId(e.target.value)}
@@ -157,10 +200,11 @@ export default function CreateJobPage() {
               <p className="text-xs text-gray-500 mt-1">Assign to a specific agent or leave blank</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="job-deadline" className="block text-sm font-medium text-gray-300 mb-2">
                 Deadline (days)
               </label>
               <input
+                id="job-deadline"
                 type="number"
                 value={deadline}
                 onChange={e => setDeadline(e.target.value)}
@@ -173,7 +217,7 @@ export default function CreateJobPage() {
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            {!approveConfirmed ? (
+            {!isApprovalValid ? (
               <button
                 onClick={handleApprove}
                 disabled={isApproving || !budget || !description}
@@ -192,11 +236,17 @@ export default function CreateJobPage() {
             )}
           </div>
 
-          {approveConfirmed && !createConfirmed && (
-            <div className="glass-card p-4 border-arc-cyan/30">
-              <p className="text-arc-cyan text-sm">
+          {isApprovalValid && !createConfirmed && (
+            <div className="glass-card p-4 border-[#6C9EA9]/30 bg-[#13304E]">
+              <p className="text-[#6C9EA9] text-sm">
                 Token approved! Now create the job to escrow funds.
               </p>
+            </div>
+          )}
+
+          {formError && (
+            <div className="glass-card p-4 border-red-500/30">
+              <p className="text-red-400 text-sm">{formError}</p>
             </div>
           )}
 

@@ -5,15 +5,15 @@ import { ERC20ABI } from './abis/ERC20'
 
 export const CONTRACTS = {
   AgentRegistry: {
-    address: '0xdaB0D268c776B558E7fd086876eAf6Af52Ca8879' as const,
+    address: '0xB50026a52d096ab998E1Ca01011fC8727C69052E' as const,
     abi: AgentRegistryABI,
   },
   AgentJobMarketplace: {
-    address: '0x35c9fee61f88533e31d81d3f4A3dBF2F9DB46A53' as const,
+    address: '0x416A1A593E1B0702C7Fb632100568B60e74c097F' as const,
     abi: AgentJobMarketplaceABI,
   },
   AgentBadge: {
-    address: '0x31A488668C4E50D691073692A0ef00Bb3160E9E8' as const,
+    address: '0xEb488eEB4dCcAD8ca0a46dE7420c34955Bd76dF3' as const,
     abi: AgentBadgeABI,
   },
   USDC: {

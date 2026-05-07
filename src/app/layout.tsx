@@ -15,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-arc-bg">
+      <body className="min-h-screen bg-[#091E39]">
         <Providers>
           <Navbar />
           <main className="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">

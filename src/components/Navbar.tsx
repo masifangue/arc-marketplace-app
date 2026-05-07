@@ -16,11 +16,11 @@ export function Navbar() {
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-card !rounded-none border-t-0 border-x-0">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#091E39]/95 backdrop-blur border-b border-[#1E3A5F]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-heading font-bold text-arc-green">Arc</span>
+            <span className="text-xl font-heading font-bold text-[#6C9EA9]">Arc</span>
             <span className="text-xl font-heading font-bold text-white">Marketplace</span>
           </Link>
 
@@ -29,7 +29,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-gray-400 hover:text-arc-green transition-colors"
+                className="text-sm text-[#ABB9C4] hover:text-[#6C9EA9] transition-colors"
               >
                 {link.label}
               </Link>
@@ -43,6 +43,9 @@ export function Navbar() {
           <button
             className="md:hidden text-gray-400"
             onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {mobileOpen ? (
@@ -55,18 +58,18 @@ export function Navbar() {
         </div>
 
         {mobileOpen && (
-          <div className="md:hidden pb-4 space-y-2">
+          <div id="mobile-menu" className="md:hidden pb-4 space-y-2 bg-[#050D1A] px-4 rounded-b-xl border border-[#1E3A5F] border-t-0 -mx-4 shadow-lg shadow-[#050D1A]/50">
             {links.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block py-2 text-sm text-gray-400 hover:text-arc-green transition-colors"
+                className="block py-2 text-sm text-[#ABB9C4] hover:text-[#6C9EA9] transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <div className="pt-2">
+            <div className="pt-2 pb-2">
               <ConnectButton />
             </div>
           </div>

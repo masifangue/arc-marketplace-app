@@ -43,10 +43,11 @@ export default function RegisterPage() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="agent-name" className="block text-sm font-medium text-gray-300 mb-2">
               Agent Name
             </label>
             <input
+              id="agent-name"
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
@@ -57,10 +58,11 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="agent-metadata-uri" className="block text-sm font-medium text-gray-300 mb-2">
               Metadata URI *
             </label>
             <input
+              id="agent-metadata-uri"
               type="text"
               value={metadataURI}
               onChange={e => setMetadataURI(e.target.value)}
@@ -74,10 +76,11 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="agent-capabilities" className="block text-sm font-medium text-gray-300 mb-2">
               Capabilities Description
             </label>
             <textarea
+              id="agent-capabilities"
               value={capabilities}
               onChange={e => setCapabilities(e.target.value)}
               placeholder="Describe what your agent can do..."
@@ -104,8 +107,8 @@ export default function RegisterPage() {
           )}
 
           {isSuccess && hash && (
-            <div className="glass-card p-6 border-arc-green/30">
-              <h3 className="text-arc-green font-heading font-semibold mb-2">
+            <div className="glass-card p-6 border-[#6C9EA9]/30 bg-[#13304E]">
+              <h3 className="text-[#6C9EA9] font-heading font-semibold mb-2">
                 Agent Registered Successfully!
               </h3>
               <p className="text-sm text-gray-400 mb-3">
@@ -115,7 +118,7 @@ export default function RegisterPage() {
                 href={`${EXPLORER_URL}/tx/${hash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-arc-cyan text-sm hover:underline"
+                className="text-[#406A83] text-sm hover:underline"
               >
                 View on Explorer →
               </a>
